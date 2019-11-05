@@ -1,6 +1,7 @@
 <?php
   	session_start();
-  	$flag=0;
+	  $flag=0;
+	  $city_after_search=array();
   	if ($_SERVER["REQUEST_METHOD"] == "GET")
   	{
   		$servername="localhost";
@@ -13,9 +14,15 @@
 		$sql="";
 	  	if(isset($_GET['city_search']))
 	  	{
+			global $city_after_search;
 	  		$city=$_GET['city'];
 	  		$sql="Select * from home_register,person_register where home_register.city='$city' and home_register.email=person_register.email";
-	  		$result=$conn->query($sql);
+			  $result=$conn->query($sql);
+			  if($result->num_rows>0){
+				  while($row=$result->fetch_assoc()){
+					  $city_after_search[]=$row['price']
+				  }
+			  }
 	  		$flag=1;
 	  	}
 	  	else if(isset($_GET['state_search']))
