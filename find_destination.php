@@ -2,6 +2,7 @@
   	session_start();
 	  $flag=0;
 	  $city_after_search=array();
+	  $city_to_be_searched;
   	if ($_SERVER["REQUEST_METHOD"] == "GET")
   	{
   		$servername="localhost";
@@ -14,15 +15,12 @@
 		$sql="";
 	  	if(isset($_GET['city_search']))
 	  	{
-			global $city_after_search;
-	  		$city=$_GET['city'];
+			global $city_after_search,$city_to_be_searched;
+			  $city=$_GET['city'];
+			  $city_to_be_searched=$city;
 	  		$sql="Select * from home_register,person_register where home_register.city='$city' and home_register.email=person_register.email";
 			  $result=$conn->query($sql);
-			  if($result->num_rows>0){
-				  while($row=$result->fetch_assoc()){
-					  $city_after_search[]=$row['price']
-				  }
-			  }
+			
 	  		$flag=1;
 	  	}
 	  	else if(isset($_GET['state_search']))
@@ -206,6 +204,39 @@
 
 			.show {display: block;}
 		</style>
+		<script>
+			function myFunction() {
+		  		document.getElementById("myDropdown").classList.toggle("show");
+			}
+
+			$(document).ready(function(){
+				$("#price_asc").click(function(){
+					var city='<?php echo $city_to_be_searched; ?>'
+				 
+					console.log('city '+city);
+					$.post("low_to_high.php",{
+						city:city	
+					},function(data,status){
+						var x=`<h1 style='text-align:center;margin-top:10px;'>Ascending Sorted Result</h1>`;
+						x=x+data;
+						$("#showSortedResults").html(x);
+					});
+				});
+				$("#price_desc").click(function(){
+					var city='<?php echo $city_to_be_searched; ?>'
+				 
+					console.log('city '+city);
+					$.post("high_to_low.php",{
+						city:city	
+					},function(data,status){
+						var x=`<h1 style='text-align:center;margin-top:10px;'>Descending Sorted Result</h1>`;
+						x=x+data;
+						$("#showSortedResults").html(x);
+					});
+				});
+			})
+			
+		</script>
 	</head>
 	<body>
 		<nav class="nav-bar">
@@ -229,29 +260,29 @@
 		<hr style="border: 3px solid black;margin-top: 65px;">
 		<div class="sorting">
 			<div class="dropdown">
-			  <button onclick="myFunction()" class="dropbtn">Sort</button>
+			  <button onclick="myFunction()" id ="sortclick" class="dropbtn">Sort</button>
 			  <div id="myDropdown" class="dropdown-content">
-			  	<form action="" method="GET">
-			  		<button name="price_asc">Price Low To High</button>
-			  	</form>
-			  	<form action="" method="GET">
-			  		<button name="price_desc">Price High To Low</button>
-			  	</form>
-			  	<form action="" method="GET">
-			  		<button name="num_of_room">Number Of Rooms</button>
-			  	</form>
+			  	<!-- <form action="" method="GET"> -->
+			  		<button id="price_asc" name="price_asc">Price Low To High</button>
+			  	<!-- </form> -->
+			  	<!-- <form action="" method="GET"> -->
+			  		<button id="price_desc" name="price_desc">Price High To Low</button>
+			  	<!-- </form> -->
+			  	<!-- <form action="" method="GET"> -->
+			  		<button id="num_of_room" name="num_of_room">Number Of Rooms</button>
+			  	<!-- </form>/ -->
 			  </div>
 			</div>
 			<form>
 				<button class="button"><span>Filter </span></button>
 			</form>
 		</div>
-		<script>
-		function myFunction() {
-		  document.getElementById("myDropdown").classList.toggle("show");
 
-		  $.ajax()
-		}
+		
+
+
+		<script>
+		
 		window.onclick = function(event) {
 		  if (!event.target.matches('.dropbtn')) {
 		    var dropdowns = document.getElementsByClassName("dropdown-content");
@@ -312,5 +343,8 @@
 				}
 			}
 		?>
+
+		
+		<div id="showSortedResults"></div>
 	</body>
 </html>
